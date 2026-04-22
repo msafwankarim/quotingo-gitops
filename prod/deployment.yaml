@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quotingo
+  namespace: quotingo
+  labels:
+    app: quotingo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quotingo
+  template:
+    metadata:
+      labels:
+        app: quotingo
+    spec:
+      containers:
+        - name: quotingo
+          image: us-central1-docker.pkg.dev/PLACEHOLDER/quotingo/quotingo:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10

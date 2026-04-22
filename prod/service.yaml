@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: quotingo
+  namespace: quotingo
+spec:
+  type: LoadBalancer
+  selector:
+    app: quotingo
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
