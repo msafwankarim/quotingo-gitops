@@ -1,0 +1,43 @@
+# CD pipeline for the quotingo-env repo.
+# Triggered by pushes to main under prod/**. Runs as the default Cloud Build SA.
+
+substitutions:
+  _ZONE: us-central1-a
+  _CLUSTER: quotingo-cluster
+  _NAMESPACE: quotingo
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+  - id: get-credentials
+    name: gcr.io/cloud-builders/gcloud
+    args:
+      - container
+      - clusters
+      - get-credentials
+      - ${_CLUSTER}
+      - --zone=${_ZONE}
+      - --project=$PROJECT_ID
+
+  - id: apply
+    name: gcr.io/cloud-builders/kubectl
+    env:
+      - CLOUDSDK_COMPUTE_ZONE=${_ZONE}
+      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}
+    args: ["apply", "-f", "prod/"]
+
+  - id: rollout
+    name: gcr.io/cloud-builders/kubectl
+    env:
+      - CLOUDSDK_COMPUTE_ZONE=${_ZONE}
+      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}
+    args:
+      - rollout
+      - status
+      - deployment/quotingo
+      - -n
+      - ${_NAMESPACE}
+      - --timeout=120s
+
+timeout: 600s
