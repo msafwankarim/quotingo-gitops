@@ -1,5 +1,6 @@
-# CD pipeline for the quotingo-env repo.
-# Triggered by pushes to main under prod/**. Runs as the default Cloud Build SA.
+# CD pipeline for the quotingo-gitops repo.
+# Triggered by pushes to main under prod/**. Runs as the user-managed
+# quotingo-cloudbuild service account configured on the trigger.
 
 substitutions:
   _ZONE: us-central1-a
