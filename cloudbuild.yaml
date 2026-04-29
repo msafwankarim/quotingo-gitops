@@ -21,7 +21,25 @@ steps:
       - --zone=${_ZONE}
       - --project=$PROJECT_ID
 
-  - id: apply
+  # Apply the namespace first and wait for it to register, then apply
+  # everything. On a fresh cluster, deployment/service creation can race
+  # against namespace registration if both are in a single apply, so we
+  # split them.
+  - id: apply-namespace
+    name: gcr.io/cloud-builders/kubectl
+    env:
+      - CLOUDSDK_COMPUTE_ZONE=${_ZONE}
+      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -e
+        kubectl apply -f prod/namespace.yaml
+        kubectl wait --for=jsonpath='{.status.phase}'=Active \
+          namespace/${_NAMESPACE} --timeout=60s
+
+  - id: apply-workload
     name: gcr.io/cloud-builders/kubectl
     env:
       - CLOUDSDK_COMPUTE_ZONE=${_ZONE}
