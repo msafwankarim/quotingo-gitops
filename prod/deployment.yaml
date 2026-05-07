@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: quotingo
-          image: us-central1-docker.pkg.dev/cc-semester-project-494708/quotingo/quotingo:0e73e6a
+          image: us-central1-docker.pkg.dev/cc-semester-project-494708/quotingo/quotingo:203c902
           ports:
             - containerPort: 8080
           resources:
